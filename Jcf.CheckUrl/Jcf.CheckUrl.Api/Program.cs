@@ -11,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerConfiguration();
 
 builder.Services.AddScoped<ICheckUrlService, CheckUrlService>();
+builder.Services.AddScoped<IVariantService, VariantService>();
 
 var app = builder.Build();
 
