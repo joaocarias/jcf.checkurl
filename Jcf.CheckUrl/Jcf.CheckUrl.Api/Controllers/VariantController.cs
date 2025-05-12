@@ -52,6 +52,7 @@ namespace Jcf.CheckUrl.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-            
+
+       
     }
 }
