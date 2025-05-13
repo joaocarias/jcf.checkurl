@@ -1,6 +1,7 @@
 ﻿
 using Jcf.CheckUrl.Api.Data;
 using Microsoft.OpenApi.Extensions;
+using Microsoft.VisualBasic;
 
 namespace Jcf.CheckUrl.Api.Services
 {
@@ -28,23 +29,17 @@ namespace Jcf.CheckUrl.Api.Services
 
                 var list = GetList();
                 foreach (var item in list)
-                {
-                    var variant = string.Empty;
-                    variant = GetVariantType(item) switch
-                    {
-                        AppAnalyticUrlVariantType.start => item.Substring(1, item.Length - 1),
-                        AppAnalyticUrlVariantType.end => item.Substring(0, item.Length - 2),
-                        AppAnalyticUrlVariantType.full => item.Substring(1, item.Length - 2),                       
-                        _ => item,
-                    };
+                {                    
+                    var varianteType = GetVariantType(item);
+                    var variant = GetVariant(item, varianteType);
 
-                    Console.WriteLine($"Url: {url} | Variant: {variant}");
+                    Console.WriteLine($"Url: {url} | Variant: {variant} | VariantType: {varianteType.ToString()} | Item: {item}");
 
                     if (!string.IsNullOrEmpty(variant) && url.Contains(variant, StringComparison.OrdinalIgnoreCase))
                     {
                         Console.WriteLine($" --------->>>>>  Url: {url} | Variant: {variant}");
 
-                        var r = ExpandWildcardPattern(url, variant);
+                        var r = ExpandWildcardPattern(url, variant, GetVariantType(item));
                         Console.WriteLine($" --------->>>>>  Url: {url} | Variant: {variant} | Result: {r}");
 
                         if (!string.IsNullOrEmpty(r))                           
@@ -102,19 +97,47 @@ namespace Jcf.CheckUrl.Api.Services
             }
         }
         
-        private string? ExpandWildcardPattern(string url, string pattern)
+        private string? ExpandWildcardPattern(string url, string pattern, AppAnalyticUrlVariantType type)
         {
             int index = url.IndexOf(pattern, StringComparison.OrdinalIgnoreCase);
             if (index == -1)
                 return null; // padrão não encontrado na URL
-
+            
             string prefix = url.Substring(0, index); // tudo antes
             string suffix = url.Substring(index + pattern.Length); // tudo depois
 
-            string full = prefix + pattern + suffix;
-            Console.WriteLine($"Prefix: {prefix} | Suffix: {suffix} | Pattern: {pattern} | Full: {full}");
+            var newUrl = type switch
+            {
+                AppAnalyticUrlVariantType.start => string.IsNullOrEmpty(prefix) ? string.Empty : prefix + pattern,
+                AppAnalyticUrlVariantType.end => string.IsNullOrEmpty(suffix) ? string.Empty : pattern + suffix,
+                AppAnalyticUrlVariantType.full => string.IsNullOrEmpty(prefix) || string.IsNullOrEmpty(suffix) ? string.Empty : prefix + pattern + suffix,
+                _ => string.Empty,
+            };
+                        
+            Console.WriteLine($"Prefix: {prefix} | Suffix: {suffix} | Pattern: {pattern} | Full: {newUrl}");
+            return newUrl;
+        }
 
-            return full;
+        private string? GetVariant(string item, AppAnalyticUrlVariantType varianteType)
+        {
+            string variant = string.Empty;
+            try
+            {
+                variant = varianteType switch
+                {
+                    AppAnalyticUrlVariantType.start => item.Substring(1, item.Length - 1),
+                    AppAnalyticUrlVariantType.end => item.Substring(0, item.Length - 1),
+                    AppAnalyticUrlVariantType.full => item.Substring(1, item.Length - 2),
+                    _ => item,
+                };
+
+                return variant;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{nameof(VariantService)} | {nameof(GetVariant)} | item: {item} | Error: {ex.Message}");
+                return null;
+            }
         }
     }
 

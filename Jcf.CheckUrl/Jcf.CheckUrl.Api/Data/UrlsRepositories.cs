@@ -20,7 +20,10 @@
             "netvasco.com*",
             "mercadolivre.com.br",
             "oitodemaio.*",
-            "*.globo.com"
+            "*.globo.com",
+            "*.channel.one.com.*",
+            "sonha.com.br",
+            "*.localhost*",
         };
 
         public static List<string> GetAll()

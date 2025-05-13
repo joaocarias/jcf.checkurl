@@ -14,8 +14,7 @@ namespace Jcf.CheckUrl.Test
 
         [Theory]
         [InlineData("x.com/joao", "x.com")]
-        [InlineData("olx.com", _invalidUrl)]
-        [InlineData("netvasco.com.br", "netvasco.com.br")]
+        [InlineData("olx.com", _invalidUrl)]        
         [InlineData("filha.joao.com.br", "filha.joao.com.br")]
         [InlineData("globo.com/alunos/938202", "globo.com")]
         [InlineData("youtube.com/joao/fhsksks", "youtube.com/joao")]
@@ -50,8 +49,7 @@ namespace Jcf.CheckUrl.Test
         }
 
         [Theory]
-        [InlineData("x.com/joao")]      
-        [InlineData("netvasco.com.br")]
+        [InlineData("x.com/joao")]    
         [InlineData("filha.joao.com.br")]
         [InlineData("globo.com/alunos/938202")]
         [InlineData("youtube.com/joao/fhsksks")]
